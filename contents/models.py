@@ -1,10 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 from django.db.models import Avg, Count
 
-User = get_user_model()
 
 class Content(models.Model):
     title = models.CharField(max_length=200)
@@ -42,15 +40,24 @@ class Content(models.Model):
         cache_key = f'content_rating_stats_{self.id}'
         cache.delete(cache_key)
         return self.get_rating_stats()
+    
+    @property
+    def average_rating(self):
+        return self.get_rating_stats()['average_rating']
+    
+    @property
+    def rating_count(self):
+        return self.get_average_rating()['rating_count']
+    
 
 class Rating(models.Model):
+    user_id = models.IntegerField()
     content = models.ForeignKey(Content, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, related_name='ratings', on_delete=models.CASCADE)
-    rating = models.FloatField(
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)]
+    rating = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        unique_together = ['content', 'user']
+        unique_together = ['content', 'user_id']

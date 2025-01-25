@@ -68,11 +68,27 @@ class Rating(models.Model):
     content = models.ForeignKey(Content, related_name='ratings', on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(
-        validators=[MinValueValidator(0), MaxValueValidator(5)]
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(5)
+        ],
+        # db_constraint=True,
+        # check_constraint='rating >= 0 AND rating <= 5',
     )
-    weight = models.FloatField(default=1.0)
+    weight = models.FloatField(default=1.0,
+        validators=[
+            MinValueValidator(0),
+            MaxValueValidator(1)
+        ],
+        # db_constraint=True,
+        # check_constraint='weight >= 0.0 AND weight <= 1.0',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
     
     class Meta:
         unique_together = ['content', 'user']

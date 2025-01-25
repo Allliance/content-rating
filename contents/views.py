@@ -39,11 +39,13 @@ class ContentRatingView(APIView):
         
         recent_similar_ratings_count = recent_similar_ratings.count()
         
+        print(recent_similar_ratings_count)
+        
         return max(1, RATE_LIMIT_PER_HOUR - recent_similar_ratings_count) / RATE_LIMIT_PER_HOUR
         
 
     def post(self, request):
-        print(request.data)
+        
         content_id = request.data.get('content_id')
         rating_value = request.data.get('rating')
         user = request.user
@@ -64,7 +66,7 @@ class ContentRatingView(APIView):
             )
         
         weight = self.calculate_rating_weight(content_id, rating_value)
-        
+        print(weight)
         # Update or create rating with weight
         Rating.objects.update_or_create(
             content=content,
@@ -78,5 +80,5 @@ class ContentRatingView(APIView):
         return Response({
             'status': 'success',
             'rating': rating_value,
-            'weight': weight
+            'weight': weight,
         })

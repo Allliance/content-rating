@@ -9,7 +9,3 @@ class ContentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Content
         fields = ['id', 'title', 'user_rating', 'average_rating', 'rating_count', 'created_at']
-
-class RatingSerializer(serializers.Serializer):
-    user_id = serializers.IntegerField(required=True)
-    rating = serializers.IntegerField(min_value=0, max_value=5)

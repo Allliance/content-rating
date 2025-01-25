@@ -17,28 +17,38 @@ class Content(models.Model):
         stats = cache.get(cache_key)
         
         if stats is None:
-            # Calculate stats
-            rating_data = self.ratings.aggregate(
-                avg_rating=Avg('rating'),
-                rating_count=Count('id')
-            )
-            
-            stats = {
-                'average_rating': float(rating_data['avg_rating'] or 0),
-                'rating_count': rating_data['rating_count']
-            }
+            # Calculate weighted average
+            ratings = self.ratings.all()
+            if not ratings:
+                stats = {
+                    'average_rating': 0.0,
+                    'rating_count': 0
+                }
+            else:
+                total_weighted_rating = sum(r.rating * r.weight for r in ratings)
+                total_weight = sum(r.weight for r in ratings)
+                
+                stats = {
+                    'average_rating': total_weighted_rating / total_weight if total_weight > 0 else 0,
+                    'rating_count': ratings.count()
+                }
             
             # Cache for 1 hour
             cache.set(cache_key, stats, 3600)
         
         return stats
 
+    def invalidate_rating_stats(self):
+        cache_key = f'content_rating_stats_{self.id}'
+        cache.delete(cache_key)
+        
+
     def update_rating_stats(self):
         """
         Force update of rating statistics in cache
         """
-        cache_key = f'content_rating_stats_{self.id}'
-        cache.delete(cache_key)
+        self.invalidate_rating_stats()
+        
         return self.get_rating_stats()
     
     @property
@@ -47,7 +57,7 @@ class Content(models.Model):
     
     @property
     def rating_count(self):
-        return self.get_average_rating()['rating_count']
+        return self.get_rating_stats()['rating_count']
     
 
 class Rating(models.Model):
@@ -56,6 +66,7 @@ class Rating(models.Model):
     rating = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
+    weight = models.FloatField(default=1.0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

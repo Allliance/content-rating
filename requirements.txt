@@ -4,3 +4,4 @@ django-redis
 pytest
 pytest-django
 Faker
+gunicorn

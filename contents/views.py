@@ -18,7 +18,7 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
         user_rating = Rating.objects.filter(
             content=OuterRef('pk'),
             user=self.request.user.id
-        ).values('rating')[:1]
+        ).values('rating')
         
         queryset = Content.objects.annotate(
             user_rating=Subquery(user_rating)
@@ -39,8 +39,6 @@ class ContentRatingView(APIView):
         
         recent_similar_ratings_count = recent_similar_ratings.count()
         
-        print(recent_similar_ratings_count)
-        
         return max(1, RATE_LIMIT_PER_HOUR - recent_similar_ratings_count) / RATE_LIMIT_PER_HOUR
         
 
@@ -51,7 +49,6 @@ class ContentRatingView(APIView):
         user = request.user
         
         if not all([content_id, rating_value, user]):
-            print([content_id, rating_value, user])
             return Response(
                 {'error': 'Missing required fields'}, 
                 status=status.HTTP_400_BAD_REQUEST
@@ -66,15 +63,13 @@ class ContentRatingView(APIView):
             )
         
         weight = self.calculate_rating_weight(content_id, rating_value)
-        print(weight)
+        
         # Update or create rating with weight
         Rating.objects.update_or_create(
             content=content,
             user=user,
-            defaults={
-                'rating': rating_value,
-                'weight': weight
-            }
+            rating=rating_value,
+            weight=weight,
         )
         
         return Response({

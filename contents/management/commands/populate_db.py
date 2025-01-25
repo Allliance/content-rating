@@ -13,6 +13,9 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         
+        # Create the simple user with username 'user' and password 'password'
+        User.objects.get_or_create(username='user', password='password')
+        
         users_min_count = 20
         contents_min_count = 100
         ratings_min_count = 1000
@@ -26,6 +29,7 @@ class Command(BaseCommand):
             email = fake.email()
             user, _ = User.objects.get_or_create(
                 username=username,
+                password='password',
                 defaults={'email': email}
             )
 
@@ -55,8 +59,8 @@ class Command(BaseCommand):
             
             # Try to create rating, skip if user already rated this content
             try:
-                rating = randint(1, 5)
-                weight = uniform(0.5, 2.0)
+                rating = randint(0, 5)
+                weight = uniform(0.0, 1.0)
                 Rating.objects.create(
                     content=content,
                     user=user,

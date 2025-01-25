@@ -42,6 +42,7 @@ To run the application locally, use the following commands:
 ```bash
 python manage.py makemigrations contents
 python manage.py migrate
+python manage.py collectstatic --noinput
 python manage.py runserver
 ```
 
@@ -62,4 +63,10 @@ To populate the database with sample data, execute:
 python manage.py populate_db
 ```
 
+If populated the database, you can login with the following credentials: `username=user, password=password`
+
+**Here are the available endpoints**:
+- /login --> First login using this endpoint, then you can user other endpoints
+- /api/contents --> list of contents (only GET method available)
+- /api/rate --> rate a specific content  (only POST method available, should be done by an authorized user)
 

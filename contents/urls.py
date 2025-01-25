@@ -1,7 +1,15 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from .views import ContentListView, ContentRatingView
 
+# Create a router and register the viewset
+router = DefaultRouter()
+router.register(r'contents', ContentListView, basename='content')
+
+# Define the urlpatterns
 urlpatterns = [
-    path('contents/', ContentListView.as_view(), name='content-list'),
-    path('contents/<int:content_id>/rate/', ContentRatingView.as_view(), name='content-rate'),
+    # Include the router URLs
+    path('', include(router.urls)),
+    # Add the rating endpoint
+    path('rate/', ContentRatingView.as_view(), name='content-rate'),
 ]

@@ -2,16 +2,17 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from django.db.models import OuterRef, Subquery, Count, Avg, StdDev
+from django.db.models import OuterRef, Subquery
 from .models import Content, Rating
-from .serializers import ContentSerializer, RatingSerializer
+from .serializers import ContentSerializer
 from django.utils import timezone
 from datetime import timedelta
-from constants import RATE_LIMIT_PER_HOUR
+from .constants import RATE_LIMIT_PER_HOUR
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
     serializer_class = ContentSerializer
     pagination_class = PageNumberPagination
+    queryset = Content.objects.all()
     
     def get_queryset(self):
         user_rating = Rating.objects.filter(

@@ -35,6 +35,7 @@ It’s worth noting that there’s no universal solution to prevent rating bombi
 
 ## Usage
 
+
 ### Running the Application Locally
 To run the application locally, use the following commands:
 
@@ -44,11 +45,14 @@ python manage.py migrate
 python manage.py runserver
 ```
 
+**Important Note**:
+- Make sure that a redis server is up in your local system, listening on port 6379.
+
 ### Running the Application Using Docker
 To run the application with Docker, simply execute:
 
 ```bash
-docker compose up backend
+docker compose up web
 ```
 
 ### Populating the Database

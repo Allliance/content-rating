@@ -20,5 +20,6 @@ from django.contrib import admin
 
 urlpatterns = [
     path('api/', include('contents.urls')),
+    path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
 ]

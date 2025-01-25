@@ -2,6 +2,9 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 User = get_user_model()
 
@@ -73,3 +76,10 @@ class Rating(models.Model):
     
     class Meta:
         unique_together = ['content', 'user']
+
+@receiver(post_save, sender=Rating)
+def invalidate_content_rating_cache(sender, instance, **kwargs):
+    """
+    Signal handler to invalidate content rating cache when a rating is created or updated
+    """
+    instance.content.invalidate_rating_stats()

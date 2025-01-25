@@ -31,7 +31,6 @@ class ContentRatingView(APIView):
     def calculate_rating_weight(self, content_id, rating_value, time_window_minutes=60):
         time_threshold = timezone.now() - timedelta(minutes=time_window_minutes)
         
-        # Get recent ratings statistics
         recent_similar_ratings = Rating.objects.filter(
             content_id=content_id,
             created_at__gte=time_threshold,

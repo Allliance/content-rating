@@ -25,7 +25,7 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
         
         return queryset
     
-class RatingSubmissionView(APIView):
+class ContentRatingView(APIView):
 
     def calculate_rating_weight(self, content_id, rating_value, time_window_minutes=60):
         time_threshold = timezone.now() - timedelta(minutes=time_window_minutes)

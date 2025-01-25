@@ -22,7 +22,8 @@ To address rating manipulation, such as a sudden surge of upvotes or downvotes f
 
 When a user submits a rating, the following formula determines the weight:
 
-$$a = b$$
+
+$$w = \frac{\max(1, RATE_LIMIT_PER_HOUR - recent_ratings_count)}{RATE_LIMIT_PER_HOUR}$$
 
 Here:
 - `recent_ratings_count` refers to the number of ratings with the same value submitted within the past hour.

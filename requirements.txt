@@ -3,3 +3,4 @@ djangorestframework
 django-redis
 pytest
 pytest-django
+Faker

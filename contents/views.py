@@ -17,7 +17,7 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         user_rating = Rating.objects.filter(
             content=OuterRef('pk'),
-            user_id=self.request.user.id
+            user=self.request.user.id
         ).values('rating')[:1]
         
         queryset = Content.objects.annotate(
@@ -44,11 +44,13 @@ class ContentRatingView(APIView):
         
 
     def post(self, request):
+        print(request.data)
         content_id = request.data.get('content_id')
         rating_value = request.data.get('rating')
-        user_id = request.user.id
+        user = request.user
         
-        if not all([content_id, rating_value, user_id]):
+        if not all([content_id, rating_value, user]):
+            print([content_id, rating_value, user])
             return Response(
                 {'error': 'Missing required fields'}, 
                 status=status.HTTP_400_BAD_REQUEST
@@ -67,7 +69,7 @@ class ContentRatingView(APIView):
         # Update or create rating with weight
         Rating.objects.update_or_create(
             content=content,
-            user_id=user_id,
+            user=user,
             defaults={
                 'rating': rating_value,
                 'weight': weight

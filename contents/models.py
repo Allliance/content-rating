@@ -1,8 +1,9 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.cache import cache
-from django.db.models import Avg, Count
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class Content(models.Model):
     title = models.CharField(max_length=200)
@@ -61,8 +62,8 @@ class Content(models.Model):
     
 
 class Rating(models.Model):
-    user_id = models.IntegerField()
     content = models.ForeignKey(Content, related_name='ratings', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     rating = models.IntegerField(
         validators=[MinValueValidator(0), MaxValueValidator(5)]
     )
@@ -71,4 +72,4 @@ class Rating(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
-        unique_together = ['content', 'user_id']
+        unique_together = ['content', 'user']

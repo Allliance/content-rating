@@ -18,6 +18,7 @@ services:
       sh -c "python manage.py makemigrations contents &&
              python manage.py migrate &&
              python manage.py populate_db &&
+             python manage.py collectstatic --noinput &&
              gunicorn --bind 0.0.0.0:8000 content_rating.wsgi:application"
     volumes:
       - .:/app

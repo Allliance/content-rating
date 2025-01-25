@@ -7,6 +7,7 @@ from .models import Content, Rating
 from .serializers import ContentSerializer, RatingSerializer
 from django.utils import timezone
 from datetime import timedelta
+from constants import RATE_LIMIT_PER_HOUR
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
     serializer_class = ContentSerializer
@@ -25,22 +26,21 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
         return queryset
     
 class RatingSubmissionView(APIView):
-    
-    def detect_rating_bombing(self, content_id, rating_value, time_window_minutes=60):
+
+    def calculate_rating_weight(self, content_id, rating_value, time_window_minutes=60):
         time_threshold = timezone.now() - timedelta(minutes=time_window_minutes)
         
-        return False
-
-    def calculate_rating_weight(self, content_id, user_id, rating_value):
-        """
-        Calculate weight for a rating based on various factors
-        """
-        base_weight = 1.0
+        # Get recent ratings statistics
+        recent_similar_ratings = Rating.objects.filter(
+            content_id=content_id,
+            created_at__gte=time_threshold,
+            rating=rating_value,
+        )
         
-        if self.detect_rating_bombing(content_id, rating_value):
-            base_weight *= 0.1
-            
-        return base_weight
+        recent_similar_ratings_count = recent_similar_ratings.count()
+        
+        return max(1, RATE_LIMIT_PER_HOUR - recent_similar_ratings_count) / RATE_LIMIT_PER_HOUR
+        
 
     def post(self, request):
         content_id = request.data.get('content_id')
@@ -61,7 +61,7 @@ class RatingSubmissionView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        weight = self.calculate_rating_weight(content_id, user_id, rating_value)
+        weight = self.calculate_rating_weight(content_id, rating_value)
         
         # Update or create rating with weight
         Rating.objects.update_or_create(

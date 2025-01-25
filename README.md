@@ -18,15 +18,15 @@ To optimize the performance of the `content-list` API, Redis caching is employed
 The cache entry has a Time-To-Live (TTL) of 1 hour. To maintain cache consistency, a signal receiver is triggered whenever a rating is created or updated. This invalidates the cached `rating_stats` for the content. The cache isn't updated immediately when a rating is submitted to favor a lazy evaluation approach.
 
 ### Handling Rating Bombing
-To address rating manipulation, such as a sudden surge of upvotes or downvotes for a piece of content, a weight decay mechanism is applied. The `Rating` model includes a `weight` field, which is a value between 0 and 1. Additionally, a `RATE_LIMIT_PER_HOUR` constant (default: `10000`) is defined in `constants.py`. 
+To address rating manipulation, such as a sudden surge of upvotes or downvotes for a piece of content, a weight decay mechanism is applied. The `Rating` model includes a `weight` field, which is a value between 0 and 1. Additionally, a `RATE_LIMIT_PER_HOUR` (limit) constant (default: `10000`) is defined in `constants.py`. 
 
 When a user submits a rating, the following formula determines the weight:
 
 
-$$w = \frac{\max(1, RATE_LIMIT_PER_HOUR - recent_ratings_count)}{RATE_LIMIT_PER_HOUR}$$
+$$w = \frac{\max(1, limit - recent)}{limit}$$
 
 Here:
-- `recent_ratings_count` refers to the number of ratings with the same value submitted within the past hour.
+- `recent` refers to the number of ratings with the same value submitted within the past hour.
 - If a large number of ratings are submitted within an hour, their importance diminishes due to reduced weight.
 
 It’s worth noting that there’s no universal solution to prevent rating bombing entirely. For instance, users may still schedule their submissions to spread them over time, bypassing some of these safeguards.

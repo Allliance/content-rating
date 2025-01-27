@@ -5,3 +5,4 @@ pytest
 pytest-django
 Faker
 gunicorn
+psycopg2-binary

@@ -18,6 +18,8 @@ Including another URLconf
 from django.contrib.auth.views import LoginView
 from django.urls import path, include
 from django.contrib import admin
+from django.shortcuts import redirect
+from django.conf.urls import handler404
 
 urlpatterns = [
     path('login/', LoginView.as_view(template_name='admin/login.html')),
@@ -25,3 +27,10 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     path('admin/', admin.site.urls),
 ]
+
+def custom_handler404(request, exception=None):
+    if request.user.is_authenticated:
+        return redirect('/api/contents')
+    return redirect('/login/')
+
+handler404 = 'content_rating.urls.custom_handler404'

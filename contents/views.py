@@ -1,21 +1,17 @@
 from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.pagination import PageNumberPagination
-from django.db.models import OuterRef, Subquery
 from .models import Content, Rating
 from .serializers import ContentSerializer
-from django.utils import timezone
-from datetime import timedelta
 from django.conf import settings
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .paginations import ContentsPagination
 from kafka import KafkaProducer
+import json
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = (AllowAny,)
     
     serializer_class = ContentSerializer
     pagination_class = ContentsPagination
@@ -38,7 +34,22 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.order_by(order_field)
         
         return queryset
+
+class ContentDetailView(APIView):
+    permission_classes = (AllowAny,)
     
+    
+    def get(self, request, content_id):
+        try:
+            content = Content.objects.get(id=content_id)
+            serializer = ContentSerializer(content)
+            return Response(serializer.data)
+        except Content.DoesNotExist:
+            return Response(
+                {'error': 'Content not found'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+
 class ContentCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]

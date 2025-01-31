@@ -2,7 +2,7 @@
 
 A high-performance, production-ready rating system built with Django and Apache Kafka, designed for scalability and real-time processing.
 
-## 🚀 Features
+## Features
 
 - **Asynchronous Rating Processing**: Utilizes Kafka for efficient batch processing of ratings
 - **Anomaly Detection**: Intelligent system to identify and handle suspicious rating patterns
@@ -11,7 +11,7 @@ A high-performance, production-ready rating system built with Django and Apache 
 - **Docker Ready**: Fully containerized setup for easy deployment
 - **Monitoring**: Built-in Prometheus integration for system metrics
 
-## 🏗️ Architecture
+## Architecture
 
 The service is built with a microservices architecture, utilizing:
 
@@ -21,7 +21,7 @@ The service is built with a microservices architecture, utilizing:
 - **Prometheus**: Metrics and monitoring
 - **Nginx**: Reverse proxy and static file serving
 
-## 🚀 Quick Start
+## Quick Start
 
 1. Clone the repository:
 ```bash
@@ -38,7 +38,7 @@ docker-compose up -d
 - API: http://localhost:80
 - Prometheus: http://localhost:9090
 
-## 🔌 API Endpoints
+## API Endpoints
 
 ### Content Management
 
@@ -60,7 +60,7 @@ POST /contents/rate/
 - Required fields: content_id, rating (0-5)
 ```
 
-## 🔧 Configuration
+## Configuration
 The service can be configured through environment variables:
 
 ```
@@ -72,7 +72,7 @@ POSTGRES_PASSWORD=postgres
 REDIS_URL=redis://redis:6379/1
 ```
 
-## 🔒 Security
+## Security
 - SSL/TLS encryption for all external communications
 - JWT-based authentication
 - Anomaly detection for suspicious rating patterns
@@ -84,7 +84,7 @@ In order to detect malicious rating behavior, when a user first rates a content,
 In order to handle real-time analytics (being able to sort the contents by rating count and rating value), these fields are stored inside the Content model, and are updated in batches by the kafka consumers (rating_processor).
 
 
-## 📈 Scaling
+## Scaling
 The service is designed to scale horizontally:
 
 1. Kafka partitioning for parallel processing

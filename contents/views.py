@@ -8,8 +8,13 @@ from .serializers import ContentSerializer
 from django.utils import timezone
 from datetime import timedelta
 from django.conf import settings
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
     serializer_class = ContentSerializer
     pagination_class = PageNumberPagination
     queryset = Content.objects.all()
@@ -27,6 +32,8 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
         return queryset
     
 class ContentRatingView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 
     def calculate_rating_weight(self, content_id, rating_value, time_window_minutes=60):
         time_threshold = timezone.now() - timedelta(minutes=time_window_minutes)

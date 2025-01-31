@@ -4,9 +4,8 @@ from faker import Faker
 from random import randint, uniform, choice
 from django.utils import timezone
 
+from authentication.models import User
 from contents.models import Content, Rating
-
-User = get_user_model()
 
 class Command(BaseCommand):
     help = 'Populate database with fake data'

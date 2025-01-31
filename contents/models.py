@@ -4,6 +4,7 @@ from django.core.cache import cache
 from django.contrib.auth import get_user_model
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
 
 
 User = get_user_model()
@@ -66,7 +67,7 @@ class Content(models.Model):
 
 class Rating(models.Model):
     content = models.ForeignKey(Content, related_name='ratings', on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     rating = models.IntegerField(
         validators=[
             MinValueValidator(0),

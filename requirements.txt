@@ -6,3 +6,5 @@ pytest-django
 Faker
 gunicorn
 psycopg2-binary
+django-prometheus
+djangorestframework-simplejwt

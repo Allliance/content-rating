@@ -8,3 +8,4 @@ gunicorn
 psycopg2-binary
 django-prometheus
 djangorestframework-simplejwt
+kafka-python

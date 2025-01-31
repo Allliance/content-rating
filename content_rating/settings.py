@@ -162,3 +162,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Constants
 
 RATE_LIMIT_PER_HOUR = int(os.getenv("RATE_LIMIT_PER_HOUR", '10000'))
+
+# Kafka settings
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVER_ADDRESS', 'localhost:9092').split(',')
+RATING_PROCESS_BATCH_SIZE = 1000

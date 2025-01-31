@@ -15,18 +15,6 @@ services:
     networks:
       - internal
 
-  redis:
-    image: redis:6-alpine
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    networks:
-      - internal
-
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -91,8 +79,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_healthy
+        
     networks:
       - internal
     expose:
@@ -101,7 +88,6 @@ services:
       - DEBUG=0
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_PASSWORD=admin
-      - REDIS_URL=redis://redis:6379/1
       - ALLOWED_HOSTS=localhost,127.0.0.1,web
       - DATABASE_URL=postgres
       - POSTGRES_DB=contents_db
@@ -135,7 +121,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  redis_data:
   certs:
 
 networks:

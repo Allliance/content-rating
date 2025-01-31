@@ -81,7 +81,7 @@ REDIS_URL=redis://redis:6379/1
 In order to detect malicious rating behavior, when a user first rates a content, it is added to the database, but not taken into account while calculating metrics for that content (processed field of the rating object is False). When the `rating_processor` encounters the rate request, it investigates the recent (last hour) ratings with the same rating value for this content. If all the recent ratings for this content were less than 10 (`MIN_RATE_COUNT`), then it cannot be verified if this rating is malicous. Otherwise, if the portion of the ratings with this value over all recent ratings was above 0.85 (`ANOMALY_THRESHOLD`), the rating would be penalized by assigning a low weight of 0.001 (`ANOMALY_WEIGHT_PENALTY`).
 
 ## Performance Consideration for large number of ratings
-In order to handle real-time analytics (being able to sort the contents by rating count and rating value), these fields are stored inside the Content model, and are updated in batches by the kafka consumers (rating_processor).
+In order to handle real-time analytics (being able to sort the contents by rating count and rating value), these fields are stored inside the Content model, and are updated by the kafka consumer (rating_processor). Also note that the rating statistics are not done by the `web` service, but instead done in a lazy manner at `rating-processor` service.
 
 
 ## Scaling

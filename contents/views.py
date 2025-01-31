@@ -96,7 +96,20 @@ class ContentRatingView(APIView):
                 {'error': 'Missing required fields'}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
-            
+        
+        try:
+            rating_value = int(rating_value)
+            if not (0 <= rating_value <= 5):
+                return Response(
+                    {'error': 'Rating must be between 0 and 5'}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        except (TypeError, ValueError):
+            return Response(
+                {'error': 'Rating must be an integer'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
         try:
             content = Content.objects.get(id=content_id)
         except Content.DoesNotExist:
@@ -105,13 +118,22 @@ class ContentRatingView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         
-        # Create rating with default weight
-        rating = Rating.objects.create(
-            content=content,
-            user=user,
-            rating=rating_value,
-            processed=False
-        )
+        try:
+            # Try to get existing rating
+            rating = Rating.objects.get(content=content, user=user)
+            rating.rating = rating_value
+            rating.processed = False
+            rating.save()
+            action = 'updated'
+        except Rating.DoesNotExist:
+            # Create new rating
+            rating = Rating.objects.create(
+                content=content,
+                user=user,
+                rating=rating_value,
+                processed=False
+            )
+            action = 'created'
         
         # Send to Kafka for processing
         self.producer.send('ratings', {
@@ -121,4 +143,8 @@ class ContentRatingView(APIView):
             'rating': rating_value
         })
         
-        return Response({'status': 'success', 'rating': rating_value})
+        return Response({
+            'status': 'success',
+            'message': f'Rating {action}',
+            'rating': rating_value
+        })

@@ -12,8 +12,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
-    networks:
-      - internal
+    ports:
+      - "5432:5432"
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -21,8 +21,8 @@ services:
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    networks:
-      - internal
+    ports:
+      - "2181:2181"
 
   kafka:
     image: confluentinc/cp-kafka:latest
@@ -31,15 +31,11 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,INTERNAL://kafka:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,INTERNAL://kafka:29092
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,INTERNAL:PLAINTEXT
-      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-    networks:
-      - internal
+    ports:
+      - "9092:9092"
 
   rating-processor:
     build: .
@@ -53,8 +49,7 @@ services:
       - POSTGRES_DB=contents_db
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    networks:
-      - internal
+      
   web:
     build: .
     command: >
@@ -97,8 +92,6 @@ services:
       - "443:443"
     depends_on:
       - web
-    networks:
-      - internal
 
   prometheus:
     image: prom/prometheus:latest
@@ -107,8 +100,6 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-    networks:
-      - internal
 
 volumes:
   postgres_data:
@@ -116,5 +107,5 @@ volumes:
   certs:
 
 networks:
-  internal:
+  default:
     driver: bridge

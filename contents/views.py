@@ -7,7 +7,7 @@ from .models import Content, Rating
 from .serializers import ContentSerializer
 from django.utils import timezone
 from datetime import timedelta
-from .constants import RATE_LIMIT_PER_HOUR
+from django.conf import settings
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
     serializer_class = ContentSerializer
@@ -37,9 +37,11 @@ class ContentRatingView(APIView):
             rating=rating_value,
         )
         
+        limit = settings.RATE_LIMIT_PER_HOUR
+        
         recent_similar_ratings_count = recent_similar_ratings.count()
         
-        return max(1, RATE_LIMIT_PER_HOUR - recent_similar_ratings_count) / RATE_LIMIT_PER_HOUR
+        return max(1, limit - recent_similar_ratings_count) / limit
         
 
     def post(self, request):

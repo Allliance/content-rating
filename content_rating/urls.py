@@ -28,10 +28,3 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('django_prometheus.urls')),
 ]
-
-def custom_handler404(request, exception=None):
-    if request.user.is_authenticated:
-        return redirect('/api/contents')
-    return redirect('/login/')
-
-handler404 = 'content_rating.urls.custom_handler404'

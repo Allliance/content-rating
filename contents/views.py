@@ -10,13 +10,14 @@ from datetime import timedelta
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
+from .paginations import ContentsPagination
 
 class ContentListView(viewsets.ReadOnlyModelViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
     serializer_class = ContentSerializer
-    pagination_class = PageNumberPagination
+    pagination_class = ContentsPagination
     queryset = Content.objects.all()
     
     def get_queryset(self):
@@ -31,6 +32,31 @@ class ContentListView(viewsets.ReadOnlyModelViewSet):
         
         return queryset
     
+class ContentCreateView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        title = request.data.get('title')
+        text = request.data.get('text')
+        
+        if not all([title, text]):
+            return Response(
+                {'error': 'Both title and text are required'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        content = Content.objects.create(
+            title=title,
+            text=text
+        )
+        
+        serializer = ContentSerializer(content)
+        return Response(
+            serializer.data,
+            status=status.HTTP_201_CREATED
+        )
+
 class ContentRatingView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]

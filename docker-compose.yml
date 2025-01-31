@@ -17,22 +17,17 @@ services:
 
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
+    container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
-    healthcheck:
-      test: ["CMD-SHELL", "echo ruok | nc localhost 2181 | grep imok"]
-      interval: 30s
-      timeout: 15s
-      retries: 5
     networks:
       - internal
 
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
-      zookeeper:
-        condition: service_healthy
+      - zookeeper
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
@@ -75,7 +70,6 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/staticfiles
-      - media_volume:/app/mediafiles
     depends_on:
       postgres:
         condition: service_healthy
@@ -85,10 +79,10 @@ services:
     expose:
       - "8000"
     environment:
-      - DEBUG=0
+      - DEBUG=1
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_PASSWORD=admin
-      - ALLOWED_HOSTS=localhost,127.0.0.1,web
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web,192.168.142.128
       - DATABASE_URL=postgres
       - POSTGRES_DB=contents_db
       - POSTGRES_USER=postgres

@@ -12,6 +12,8 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    networks:
+      - internal
 
   redis:
     image: redis:6-alpine
@@ -22,6 +24,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    networks:
+      - internal
 
   web:
     build: .
@@ -50,7 +54,7 @@ services:
       - DJANGO_SUPERUSER_USERNAME=admin
       - DJANGO_SUPERUSER_PASSWORD=admin
       - REDIS_URL=redis://redis:6379/1
-      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+      - ALLOWED_HOSTS=localhost,127.0.0.1,web
       - DATABASE_URL=postgres
       - POSTGRES_DB=contents_db
       - POSTGRES_USER=postgres

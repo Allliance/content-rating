@@ -111,6 +111,45 @@ DATABASES = {
     }
 }
 
+# Logging
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+        'contents': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': False,
+        },
+    },
+}
+
+
 AUTH_USER_MODEL = 'authentication.User'
 
 # Password validation
@@ -155,6 +194,6 @@ MIN_RATE_COUNT = int(os.getenv("MIN_RATE_COUNT", '10'))
 ANOMALY_THRESHOLD = float(os.getenv("ANOMALY_THRESHOLD", '0.85'))
 
 # Kafka settings
-KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVER_ADDRESS', 'localhost:9092').split(',')
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092').split(',')
 RATING_PROCESS_BATCH_SIZE = 3
 ANOMALY_WEIGHT_PENALTY = 0.001

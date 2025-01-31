@@ -159,9 +159,10 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Constants
-
+# Rating Processor Policies
 RATE_LIMIT_PER_HOUR = int(os.getenv("RATE_LIMIT_PER_HOUR", '10000'))
+MIN_RATE_COUNT = int(os.getenv("MIN_RATE_COUNT", '10'))
+ANOMALY_THRESHOLD = float(os.getenv("ANOMALY_THRESHOLD", '0.85'))
 
 # Kafka settings
 KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVER_ADDRESS', 'localhost:9092').split(',')

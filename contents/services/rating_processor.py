@@ -28,13 +28,13 @@ class RatingProcessor:
         )
         
         total_recent = recent_ratings.count()
-        if total_recent < 10:  # Not enough data to detect anomaly
+        if total_recent < settings.MIN_RATE_COUNT:  # Not enough data to detect anomaly
             return False
             
         rating_value_count = recent_ratings.filter(rating=rating_value).count()
         
         # If more than 80% of recent ratings are the same value, consider it suspicious
-        return (rating_value_count / total_recent) > 0.8
+        return (rating_value_count / total_recent) > settings.ANOMALY_THRESHOLD
     
     def process_ratings_batch(self, content_id):
         """Process all unprocessed ratings for a content"""
@@ -45,6 +45,7 @@ class RatingProcessor:
                 processed=False
             )
             
+            # Process each unprocessed rating
             for rating in unprocessed_ratings:
                 # Check for anomaly and adjust weight if necessary
                 if self.check_rating_anomaly(content_id, rating.rating):
@@ -58,15 +59,8 @@ class RatingProcessor:
             weight_sum = sum(r.weight for r in all_ratings)
             new_average = weighted_sum / weight_sum if weight_sum > 0 else 0
             
-            # Get rating distribution
-            distribution = dict(all_ratings.values('rating')
-                              .annotate(count=Count('rating'))
-                              .values_list('rating', 'count'))
-            
-            # Update content statistics
             content.average_rating = new_average
             content.rating_count = all_ratings.count()
-            content.rating_distribution = distribution
             content.save()
             
             # Mark all processed

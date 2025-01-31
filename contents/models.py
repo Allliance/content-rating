@@ -10,10 +10,8 @@ class Content(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     
-    # New fields for storing rating statistics
     rating_count = models.IntegerField(default=0)
     average_rating = models.FloatField(default=0.0)
-    rating_distribution = models.JSONField(default=dict)  # Stores count for each rating value
     
     class Meta:
         indexes = [

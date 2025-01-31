@@ -26,7 +26,7 @@ services:
       retries: 3
     networks:
       - internal
-      
+
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     environment:
@@ -113,7 +113,6 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
       - static_volume:/usr/share/nginx/html/static
-      - media_volume:/usr/share/nginx/html/media
       - ./certs:/etc/nginx/certs:ro
     ports:
       - "80:80"
@@ -136,7 +135,6 @@ services:
 volumes:
   postgres_data:
   static_volume:
-  media_volume:
   redis_data:
   certs:
 

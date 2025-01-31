@@ -1,7 +1,7 @@
 global:
-  scrape_interval: 60s
+  scrape_interval: 15s
 
 scrape_configs:
-  - job_name: 'web'
+  - job_name: 'dnajgo-web'
     static_configs:
       - targets: ['web:8000']

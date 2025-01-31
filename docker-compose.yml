@@ -41,10 +41,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    deploy:
-      replicas: 3
-      restart_policy:
-        condition: on-failure
+    networks:
+      - internal
+    expose:
+      - "8000"
     environment:
       - DEBUG=0
       - DJANGO_SUPERUSER_USERNAME=admin
@@ -68,6 +68,9 @@ services:
       - "443:443"
     depends_on:
       - web
+    networks:
+      - internal
+
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
@@ -75,6 +78,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
+    networks:
+      - internal
 
 volumes:
   postgres_data:
@@ -82,3 +87,7 @@ volumes:
   media_volume:
   redis_data:
   certs:
+
+networks:
+  internal:
+    driver: bridge
